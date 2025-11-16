@@ -1,0 +1,26 @@
+{
+  "name": "local-video-player",
+  "version": "1.0.0",
+  "description": "Web application to browse and play local video files on local network",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "build:prod": "cd client && npm run build",
+    "start": "node server.js",
+    "start:prod": "npm run build:prod && npm start"
+  },
+  "keywords": ["video", "player", "local", "network"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
