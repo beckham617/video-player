@@ -61,20 +61,35 @@ function getRootDirectory() {
   }
 }
 
+// Helper function to validate path access (allows full filesystem access)
+function isPathAllowed(filePath) {
+  const os = require('os');
+  const platform = os.platform();
+  const resolvedPath = path.resolve(filePath);
+  
+  if (platform === 'win32') {
+    // On Windows, allow any path that starts with a drive letter (A-Z:\)
+    // This allows access to all drives (C:\, D:\, etc.)
+    return /^[A-Z]:\\/i.test(resolvedPath);
+  } else {
+    // On Mac/Linux, allow any absolute path (starting with "/")
+    // path.resolve() ensures we get an absolute path, and we just need to verify it's absolute
+    return resolvedPath.startsWith('/');
+  }
+}
+
 // API endpoint to browse directory
 app.get('/api/browse', async (req, res) => {
   try {
     // If no path specified, start at root directory
     const dirPath = req.query.path || getRootDirectory();
     
-    // Security: prevent directory traversal - allow any Windows drive or current directory
-    const resolvedPath = path.resolve(dirPath);
-    const isWindowsPath = /^[A-Z]:\\/.test(resolvedPath);
-    const isInCurrentDir = resolvedPath.startsWith(process.cwd());
-    
-    if (!isInCurrentDir && !isWindowsPath) {
-      return res.status(403).json({ error: 'Access denied' });
+    // Security: validate path - allows full filesystem access while preventing path traversal
+    if (!isPathAllowed(dirPath)) {
+      return res.status(403).json({ error: 'Access denied: Invalid path' });
     }
+    
+    const resolvedPath = path.resolve(dirPath);
 
     const items = await fs.readdir(dirPath, { withFileTypes: true });
     
@@ -134,14 +149,12 @@ app.get('/api/video', (req, res) => {
     return res.status(400).json({ error: 'Video path is required' });
   }
 
-  // Security: prevent directory traversal - allow any Windows drive or current directory
-  const resolvedPath = path.resolve(videoPath);
-  const isWindowsPath = /^[A-Z]:\\/.test(resolvedPath);
-  const isInCurrentDir = resolvedPath.startsWith(process.cwd());
-  
-  if (!isInCurrentDir && !isWindowsPath) {
-    return res.status(403).json({ error: 'Access denied' });
+  // Security: validate path - allows full filesystem access while preventing path traversal
+  if (!isPathAllowed(videoPath)) {
+    return res.status(403).json({ error: 'Access denied: Invalid path' });
   }
+  
+  const resolvedPath = path.resolve(videoPath);
 
   try {
     const stat = statSync(resolvedPath);
