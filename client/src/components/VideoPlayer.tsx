@@ -151,12 +151,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoPath, onClose, lastPosit
     const ext = videoPath.split('.').pop()?.toLowerCase() || '';
     setFileExtension(ext);
     
-    console.log('Loading video:', {
-      path: videoPath,
-      extension: ext,
-      url: videoUrl
-    });
-    
     // For formats that browsers support natively, specify MIME type
     // For others, let the browser try to auto-detect (may not work for AVI, MKV, etc.)
     const browserSupportedFormats = ['mp4', 'm4v', 'webm', 'ogv', 'mov'];
@@ -164,7 +158,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoPath, onClose, lastPosit
     
     if (shouldSpecifyType) {
       const mimeType = getMimeType(ext);
-      console.log('Setting source with MIME type:', mimeType);
       player.src({
         src: videoUrl,
         type: mimeType
@@ -172,7 +165,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoPath, onClose, lastPosit
     } else {
       // Let browser auto-detect for formats like AVI, MKV, etc.
       // Some browsers might be able to play them with the right codecs
-      console.log('Setting source without MIME type (auto-detect)');
       player.src(videoUrl);
     }
 
@@ -213,22 +205,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoPath, onClose, lastPosit
       }
     });
 
-    // Also listen for loadstart to verify the request is being made
-    player.on('loadstart', () => {
-      console.log('Video load started');
-    });
-
     // Listen for loadedmetadata to ensure duration is available
     player.on('loadedmetadata', () => {
-      console.log('Video metadata loaded, duration:', player.duration());
-      
       // Restore last position if available (use ref to get initial value)
       const positionToRestore = lastPositionRef.current;
       if (positionToRestore !== undefined && positionToRestore > 0) {
         const duration = player.duration();
         // Only restore if position is valid (not at the end)
         if (duration && positionToRestore < duration - 5) {
-          console.log(`Resuming from position: ${positionToRestore.toFixed(2)}s`);
           player.currentTime(positionToRestore);
           
           // Show a notification
@@ -243,7 +227,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoPath, onClose, lastPosit
 
     // Listen for canplay to verify video can be played
     player.on('canplay', () => {
-      console.log('Video can play');
       setError('');
     });
 

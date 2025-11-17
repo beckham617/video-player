@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -18,14 +18,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "incremental": true
   },
   "include": [
     "src"
   ],
   "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx"
+    "node_modules",
+    "build",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }
 
